@@ -2,10 +2,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/fireba
 import { 
     getAuth, 
     RecaptchaVerifier, 
-    signInWithPhoneNumber 
+    signInWithPhoneNumber,
+    onAuthStateChanged,
+    signOut
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
-// Your exact Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCqLFv3F9-3HAS7m7OIyCLD3M86KaRltN4",
     authDomain: "test-project-58ac0.firebaseapp.com",
@@ -16,169 +17,98 @@ const firebaseConfig = {
     measurementId: "G-YHEPWY3EJC"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-auth.useDeviceLanguage(); // Automatically sets SMS language to user's device preference
 
-// Initialize Country Code Picker
-const phoneInputField = document.querySelector("#phone");
-const phoneInput = window.intlTelInput(phoneInputField, {
-    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-    initialCountry: "lk", // Default to Sri Lanka, user can still change it
-    preferredCountries: ["lk", "us", "gb", "in"],
-    separateDialCode: true,
-});
-
-// UI Elements
+// --- UI Elements ---
 const step1 = document.getElementById('step-1');
 const step2 = document.getElementById('step-2');
 const sendOtpBtn = document.getElementById('send-otp-btn');
 const verifyOtpBtn = document.getElementById('verify-otp-btn');
-const resendBtn = document.getElementById('resend-btn');
-const timerSpan = document.getElementById('timer');
 const messageContainer = document.getElementById('message-container');
 const headerTitle = document.getElementById('header-title');
 const headerSubtitle = document.getElementById('header-subtitle');
 
+// --- 1. Check Login State ---
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // User is already signed in
+        showSuccessState(user.phoneNumber);
+    } else {
+        // User is signed out
+        showLoginState();
+    }
+});
+
+// --- 2. Country Code Initialization ---
+const phoneInput = window.intlTelInput(document.querySelector("#phone"), {
+    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+    initialCountry: "lk",
+    separateDialCode: true,
+});
+
+// --- 3. OTP Logic ---
 let confirmationResult = null;
-let countdownInterval;
 
-// Initialize reCAPTCHA
-function setupRecaptcha() {
-    if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-            'size': 'invisible',
-            'callback': (response) => {
-                // reCAPTCHA solved
-            },
-            'expired-callback': () => {
-                showMessage("reCAPTCHA expired. Please try again.", "error");
-            }
-        });
-    }
-}
+async function sendOTP() {
+    const phoneNumber = phoneInput.getNumber();
+    if (!phoneInput.isValidNumber()) return alert("Invalid number");
 
-// Handle Sending OTP
-async function handleSendOtp() {
-    if (!phoneInput.isValidNumber()) {
-        showMessage("Please enter a valid mobile number.", "error");
-        return;
-    }
-
-    const phoneNumber = phoneInput.getNumber(); 
-    sendOtpBtn.disabled = true;
-    sendOtpBtn.innerText = "Sending Securely...";
-    hideMessage();
-
-    setupRecaptcha();
-    const appVerifier = window.recaptchaVerifier;
-
+    // Setup ReCaptcha
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+    
     try {
-        confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-        
-        // Transition to Step 2
+        sendOtpBtn.disabled = true;
+        confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
         step1.classList.add('hidden');
         step2.classList.remove('hidden');
-        headerTitle.innerText = "Check your phone";
-        headerSubtitle.innerText = `We sent an SMS with a code to ${phoneNumber}`;
-        
-        showMessage("OTP Sent Successfully!", "success");
-        startResendTimer();
-
+        headerTitle.innerText = "Verify OTP";
+        showMessage("Code sent to " + phoneNumber, "success");
     } catch (error) {
-        console.error("SMS Error:", error);
+        alert(error.message);
         sendOtpBtn.disabled = false;
-        sendOtpBtn.innerText = "Send OTP";
-        
-        // If it fails, we must reset the recaptcha to try again
-        if (window.recaptchaVerifier) {
-            window.recaptchaVerifier.render().then(function(widgetId) {
-                grecaptcha.reset(widgetId);
-            });
-        }
-        
-        showMessage(getFriendlyErrorMessage(error.code), "error");
     }
 }
 
-// Handle Verifying OTP
-async function handleVerifyOtp() {
-    const code = document.getElementById('otp-code').value.trim();
-    
-    if (code.length !== 6) {
-        showMessage("Please enter the 6-digit verification code.", "error");
-        return;
-    }
-
-    verifyOtpBtn.disabled = true;
-    verifyOtpBtn.innerText = "Verifying Code...";
-    hideMessage();
-
+async function verifyOTP() {
+    const code = document.getElementById('otp-code').value;
     try {
-        const result = await confirmationResult.confirm(code);
-        const user = result.user;
-        
-        // Success UI State
-        step2.classList.add('hidden');
-        headerTitle.innerText = "Verified! ✅";
-        headerTitle.classList.replace('text-gray-800', 'text-green-600');
-        headerSubtitle.innerText = "Your mobile number has been successfully authenticated.";
-        showMessage(`System unlocked for: ${user.phoneNumber}`, "success");
-
+        await confirmationResult.confirm(code);
+        // onAuthStateChanged will handle the UI transition
     } catch (error) {
-        verifyOtpBtn.disabled = false;
-        verifyOtpBtn.innerText = "Verify Mobile";
-        showMessage("Incorrect code. Please check the SMS and try again.", "error");
+        alert("Wrong code. Try again.");
     }
 }
 
-// Resend Timer Logic
-function startResendTimer() {
-    let timeLeft = 60;
-    resendBtn.disabled = true;
+// --- 4. UI Transitions ---
+function showSuccessState(phone) {
+    step1.classList.add('hidden');
+    step2.classList.add('hidden');
+    headerTitle.innerText = "Verified! ✅";
+    headerTitle.classList.add('text-green-600');
+    headerSubtitle.innerText = "Logged in as: " + phone;
     
-    clearInterval(countdownInterval);
-    countdownInterval = setInterval(() => {
-        timeLeft--;
-        timerSpan.innerText = `(${timeLeft}s)`;
-        
-        if (timeLeft <= 0) {
-            clearInterval(countdownInterval);
-            resendBtn.disabled = false;
-            timerSpan.innerText = "";
-        }
-    }, 1000);
+    // Add a logout button dynamically
+    messageContainer.innerHTML = `<button id="logout-btn" class="mt-4 text-red-500 underline">Sign Out</button>`;
+    messageContainer.classList.remove('hidden');
+    document.getElementById('logout-btn').onclick = () => signOut(auth);
 }
 
-// Utility: Show/Hide Messages
-function showMessage(text, type) {
-    messageContainer.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
-    
-    if (type === "error") {
-        messageContainer.classList.add('bg-red-100', 'text-red-700');
-    } else {
-        messageContainer.classList.add('bg-green-100', 'text-green-700');
-    }
-    
-    messageContainer.innerText = text;
-}
-
-function hideMessage() {
+function showLoginState() {
+    step1.classList.remove('hidden');
+    step2.classList.add('hidden');
+    headerTitle.innerText = "Secure Verification";
+    headerTitle.classList.remove('text-green-600');
+    headerSubtitle.innerText = "Enter your mobile number to continue";
     messageContainer.classList.add('hidden');
+    sendOtpBtn.disabled = false;
 }
 
-// Utility: Friendly Error Messages
-function getFriendlyErrorMessage(errorCode) {
-    switch (errorCode) {
-        case 'auth/too-many-requests': return "Too many attempts. Please try again later.";
-        case 'auth/invalid-phone-number': return "The format of the phone number is invalid.";
-        case 'auth/network-request-failed': return "Network error. Please check your internet connection.";
-        default: return "An error occurred while sending the SMS. Please try again.";
-    }
+function showMessage(msg, type) {
+    messageContainer.innerText = msg;
+    messageContainer.className = `mt-4 p-3 rounded text-sm ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+    messageContainer.classList.remove('hidden');
 }
 
-// Event Listeners
-sendOtpBtn.addEventListener('click', handleSendOtp);
-verifyOtpBtn.addEventListener('click', handleVerifyOtp);
-resendBtn.addEventListener('click', handleSendOtp); // Re-uses the send logic
+sendOtpBtn.onclick = sendOTP;
+verifyOtpBtn.onclick = verifyOTP;
