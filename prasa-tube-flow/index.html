@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRASA | YouTube Automation Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-6">
+
+    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-2xl border border-gray-700">
+        <div class="mb-8 border-b border-gray-700 pb-4">
+            <h1 class="text-3xl font-bold text-blue-400 tracking-wide">PRASA Studio</h1>
+            <p class="text-gray-400 mt-2">AI Metadata & Auto-Upload Scheduler</p>
+        </div>
+
+        <form id="uploadForm" class="space-y-6">
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Video File</label>
+                <input type="file" id="videoFile" accept="video/*" required
+                    class="block w-full text-sm text-gray-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-md file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-600 file:text-white
+                    hover:file:bg-blue-700 cursor-pointer bg-gray-700 rounded-md">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Video Summary (For AI Generation)</label>
+                <textarea id="summary" rows="3" required placeholder="Briefly describe what this video is about..."
+                    class="w-full bg-gray-700 border border-gray-600 rounded-md p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Schedule Upload</label>
+                <input type="datetime-local" id="scheduledTime" required
+                    class="w-full bg-gray-700 border border-gray-600 rounded-md p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <button type="submit" id="submitBtn"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md transition duration-200">
+                Generate AI Metadata & Schedule
+            </button>
+        </form>
+
+        <div id="statusMessage" class="mt-6 text-center text-sm hidden font-medium"></div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing & Uploading...";
+            
+            const formData = new FormData();
+            formData.append('videoFile', document.getElementById('videoFile').files[0]);
+            formData.append('summary', document.getElementById('summary').value);
+            formData.append('scheduledTime', document.getElementById('scheduledTime').value);
+
+            try {
+                const response = await fetch('http://localhost:3000/api/schedule', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusMessage.innerText = "Success! Video scheduled and metadata generated.";
+                    statusMessage.className = "mt-6 text-center text-sm font-medium text-green-400 block";
+                    document.getElementById('uploadForm').reset();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                statusMessage.innerText = "Error: Could not schedule video.";
+                statusMessage.className = "mt-6 text-center text-sm font-medium text-red-400 block";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Generate AI Metadata & Schedule";
+            }
+        });
+    </script>
+</body>
+</html>
