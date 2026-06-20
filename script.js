@@ -1,10 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { 
-    getAuth, 
-    RecaptchaVerifier, 
-    signInWithPhoneNumber,
+import {
+    getAuth,
     onAuthStateChanged,
-    signOut
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -20,95 +20,71 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// --- UI Elements ---
-const step1 = document.getElementById('step-1');
-const step2 = document.getElementById('step-2');
-const sendOtpBtn = document.getElementById('send-otp-btn');
-const verifyOtpBtn = document.getElementById('verify-otp-btn');
-const messageContainer = document.getElementById('message-container');
-const headerTitle = document.getElementById('header-title');
-const headerSubtitle = document.getElementById('header-subtitle');
+const adminEmail = "admin@test.com";
+const adminPassword = "Admin@1234";
 
-// --- 1. Check Login State ---
+const loginBtn = document.getElementById("login-btn");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const messageContainer = document.getElementById("message-container");
+
+function showMessage(message, type = "error") {
+    messageContainer.textContent = message;
+    messageContainer.className = `message ${type === "success" ? "success" : "error"}`;
+    messageContainer.classList.remove("hidden");
+}
+
+async function signInAdmin() {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+        showMessage("Please enter both email and password.");
+        return;
+    }
+
+    if (email !== adminEmail) {
+        showMessage("Only the admin account is allowed to login.");
+        return;
+    }
+
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "dashboard.html";
+    } catch (error) {
+        if (error.code === "auth/user-not-found") {
+            try {
+                await createUserWithEmailAndPassword(auth, adminEmail, adminPassword);
+                window.location.href = "dashboard.html";
+            } catch (createError) {
+                showMessage(createError.message);
+            }
+        } else if (error.code === "auth/wrong-password") {
+            showMessage("Incorrect password. Please try again.");
+        } else {
+            showMessage(error.message);
+        }
+    }
+}
+
 onAuthStateChanged(auth, (user) => {
-    if (user) {
-        // User is already signed in
-        showSuccessState(user.phoneNumber);
-    } else {
-        // User is signed out
-        showLoginState();
+    const currentPath = window.location.pathname;
+    const isLoginPage = currentPath.endsWith("/") || currentPath.endsWith("index.html");
+    const isDashboardPage = currentPath.endsWith("dashboard.html");
+
+    if (user && isLoginPage) {
+        window.location.href = "dashboard.html";
+    }
+
+    if (!user && isDashboardPage) {
+        window.location.href = "index.html";
     }
 });
 
-// --- 2. Country Code Initialization ---
-const phoneInput = window.intlTelInput(document.querySelector("#phone"), {
-    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-    initialCountry: "lk",
-    separateDialCode: true,
+loginBtn.addEventListener("click", signInAdmin);
+passwordInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        signInAdmin();
+    }
 });
-
-// --- 3. OTP Logic ---
-let confirmationResult = null;
-
-async function sendOTP() {
-    const phoneNumber = phoneInput.getNumber();
-    if (!phoneInput.isValidNumber()) return alert("Invalid number");
-
-    // Setup ReCaptcha
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
-    
-    try {
-        sendOtpBtn.disabled = true;
-        confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
-        step1.classList.add('hidden');
-        step2.classList.remove('hidden');
-        headerTitle.innerText = "Verify OTP";
-        showMessage("Code sent to " + phoneNumber, "success");
-    } catch (error) {
-        alert(error.message);
-        sendOtpBtn.disabled = false;
-    }
-}
-
-async function verifyOTP() {
-    const code = document.getElementById('otp-code').value;
-    try {
-        await confirmationResult.confirm(code);
-        // onAuthStateChanged will handle the UI transition
-    } catch (error) {
-        alert("Wrong code. Try again.");
-    }
-}
-
-// --- 4. UI Transitions ---
-function showSuccessState(phone) {
-    step1.classList.add('hidden');
-    step2.classList.add('hidden');
-    headerTitle.innerText = "Verified! ✅";
-    headerTitle.classList.add('text-green-600');
-    headerSubtitle.innerText = "Logged in as: " + phone;
-    
-    // Add a logout button dynamically
-    messageContainer.innerHTML = `<button id="logout-btn" class="mt-4 text-red-500 underline">Sign Out</button>`;
-    messageContainer.classList.remove('hidden');
-    document.getElementById('logout-btn').onclick = () => signOut(auth);
-}
-
-function showLoginState() {
-    step1.classList.remove('hidden');
-    step2.classList.add('hidden');
-    headerTitle.innerText = "Secure Verification";
-    headerTitle.classList.remove('text-green-600');
-    headerSubtitle.innerText = "Enter your mobile number to continue";
-    messageContainer.classList.add('hidden');
-    sendOtpBtn.disabled = false;
-}
-
-function showMessage(msg, type) {
-    messageContainer.innerText = msg;
-    messageContainer.className = `mt-4 p-3 rounded text-sm ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
-    messageContainer.classList.remove('hidden');
-}
-
-sendOtpBtn.onclick = sendOTP;
-verifyOtpBtn.onclick = verifyOTP;
