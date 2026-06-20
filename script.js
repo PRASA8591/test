@@ -8,23 +8,24 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCqLFv3F9-3HAS7m7OIyCLD3M86KaRltN4",
-    authDomain: "test-project-58ac0.firebaseapp.com",
-    projectId: "test-project-58ac0",
-    storageBucket: "test-project-58ac0.firebasestorage.app",
-    messagingSenderId: "10691087045",
-    appId: "1:10691087045:web:92637a0ab765882ce5feac",
-    measurementId: "G-YHEPWY3EJC"
+    apiKey: "AIzaSyBPd2SeDOQ7x0nnShwKqykAn_zNkgx9t4Y",
+    authDomain: "test-f52a6.firebaseapp.com",
+    projectId: "test-f52a6",
+    storageBucket: "test-f52a6.firebasestorage.app",
+    messagingSenderId: "276833014789",
+    appId: "1:276833014789:web:7ff8d9c5f8409533e6386c",
+    measurementId: "G-BSLWX7RKNE"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const adminEmail = "admin@test.com";
-const adminPassword = "Admin@1234";
+const adminUsername = "admin";
+const adminPassword = "8591";
+const adminEmail = "admin@test-f52a6.firebaseapp.com";
 
 const loginBtn = document.getElementById("login-btn");
-const emailInput = document.getElementById("email");
+const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 const messageContainer = document.getElementById("message-container");
 
@@ -38,23 +39,30 @@ async function signInAdmin() {
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
 
-    if (!email || !password) {
-        showMessage("Please enter both email and password.");
+    if (!username || !password) {
+        showMessage("Please enter both username and password.");
         return;
     }
 
-    if (email !== adminEmail) {
-        showMessage("Only the admin account is allowed to login.");
+    if (username !== adminUsername) {
+        showMessage("Only the admin username is allowed to login.");
+        return;
+    }
+
+    if (password !== adminPassword) {
+        showMessage("Incorrect password. Please try again.");
         return;
     }
 
     try {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+        localStorage.setItem("lastAdminLogin", new Date().toLocaleString());
         window.location.href = "dashboard.html";
     } catch (error) {
         if (error.code === "auth/user-not-found") {
             try {
                 await createUserWithEmailAndPassword(auth, adminEmail, adminPassword);
+                localStorage.setItem("lastAdminLogin", new Date().toLocaleString());
                 window.location.href = "dashboard.html";
             } catch (createError) {
                 showMessage(createError.message);
@@ -82,6 +90,12 @@ onAuthStateChanged(auth, (user) => {
 });
 
 loginBtn.addEventListener("click", signInAdmin);
+usernameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        signInAdmin();
+    }
+});
 passwordInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         event.preventDefault();

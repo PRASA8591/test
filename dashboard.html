@@ -9,18 +9,26 @@
 <body>
     <div class="container">
         <div class="dashboard-header">
-            <h2>Dashboard</h2>
-            <p>Welcome, Admin. You are logged in and can manage the application.</p>
+            <h2>Admin Dashboard</h2>
+            <p>Welcome back, admin. Monitor system status and manage key controls.</p>
         </div>
 
         <div class="dashboard-cards">
             <div class="card">
-                <h3>Total Users</h3>
-                <p>1</p>
+                <h3>System Status</h3>
+                <p id="status-value">Healthy</p>
             </div>
             <div class="card">
-                <h3>Active Sessions</h3>
-                <p>1</p>
+                <h3>Active Admin</h3>
+                <p>admin</p>
+            </div>
+            <div class="card">
+                <h3>Last Login</h3>
+                <p id="last-login">Loading...</p>
+            </div>
+            <div class="card">
+                <h3>Firebase User</h3>
+                <p id="user-email">Loading...</p>
             </div>
         </div>
 
@@ -32,24 +40,30 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyCqLFv3F9-3HAS7m7OIyCLD3M86KaRltN4",
-            authDomain: "test-project-58ac0.firebaseapp.com",
-            projectId: "test-project-58ac0",
-            storageBucket: "test-project-58ac0.firebasestorage.app",
-            messagingSenderId: "10691087045",
-            appId: "1:10691087045:web:92637a0ab765882ce5feac",
-            measurementId: "G-YHEPWY3EJC"
+            apiKey: "AIzaSyBPd2SeDOQ7x0nnShwKqykAn_zNkgx9t4Y",
+            authDomain: "test-f52a6.firebaseapp.com",
+            projectId: "test-f52a6",
+            storageBucket: "test-f52a6.firebasestorage.app",
+            messagingSenderId: "276833014789",
+            appId: "1:276833014789:web:7ff8d9c5f8409533e6386c",
+            measurementId: "G-BSLWX7RKNE"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
         const logoutBtn = document.getElementById('logout-btn');
+        const lastLogin = document.getElementById('last-login');
+        const userEmail = document.getElementById('user-email');
 
         onAuthStateChanged(auth, (user) => {
             if (!user) {
                 window.location.href = 'index.html';
+                return;
             }
+
+            lastLogin.textContent = localStorage.getItem('lastAdminLogin') || 'Not available';
+            userEmail.textContent = user.email || 'admin@test-f52a6.firebaseapp.com';
         });
 
         logoutBtn.addEventListener('click', async () => {
