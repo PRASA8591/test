@@ -36,7 +36,7 @@ function showMessage(message, type = "error") {
 }
 
 async function signInAdmin() {
-    const email = emailInput.value.trim();
+    const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
     if (!username || !password) {
@@ -57,6 +57,7 @@ async function signInAdmin() {
     try {
         await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
         localStorage.setItem("lastAdminLogin", new Date().toLocaleString());
+        showMessage("Login successful. Redirecting...", "success");
         window.location.href = "dashboard.html";
     } catch (error) {
         if (error.code === "auth/user-not-found") {
