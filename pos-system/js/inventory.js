@@ -14,6 +14,14 @@ function requireAuth() {
   const auth = localStorage.getItem('pos_auth');
   if (!auth) {
     window.location.href = 'index.html';
+    return null;
+  }
+  try {
+    return JSON.parse(auth);
+  } catch (e) {
+    localStorage.removeItem('pos_auth');
+    window.location.href = 'index.html';
+    return null;
   }
 }
 
@@ -73,12 +81,18 @@ async function handleStockUpdate(event) {
 }
 
 function init() {
-  requireAuth();
-  renderNavbar();
+  const user = requireAuth();
+  if (!user) return;
+  renderNavbar(user);
   renderSidebar();
   form?.addEventListener('submit', handleStockUpdate);
   refreshButton?.addEventListener('click', renderStockLogs);
   renderStockLogs();
+  console.log('✓ Inventory page loaded');
 }
 
-init();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}

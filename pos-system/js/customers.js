@@ -13,6 +13,14 @@ function requireAuth() {
   const auth = localStorage.getItem('pos_auth');
   if (!auth) {
     window.location.href = 'index.html';
+    return null;
+  }
+  try {
+    return JSON.parse(auth);
+  } catch (e) {
+    localStorage.removeItem('pos_auth');
+    window.location.href = 'index.html';
+    return null;
   }
 }
 
@@ -56,12 +64,18 @@ async function handleSave(event) {
 }
 
 function init() {
-  requireAuth();
-  renderNavbar();
+  const user = requireAuth();
+  if (!user) return;
+  renderNavbar(user);
   renderSidebar();
   form?.addEventListener('submit', handleSave);
   refreshButton?.addEventListener('click', renderCustomers);
   renderCustomers();
+  console.log('✓ Customers page loaded');
 }
 
-init();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}

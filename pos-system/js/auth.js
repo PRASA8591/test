@@ -1,4 +1,4 @@
-import { db, initDefaultAdmin } from '../database/db.js';
+import { db, initDefaultAdmin, verifyDB } from '../database/db.js';
 
 const loginForm = document.getElementById('login-form');
 const usernameInput = document.getElementById('username');
@@ -28,38 +28,67 @@ async function handleLogin(event) {
     return;
   }
 
-  const user = await db.users.where('username').equals(username).first();
-  if (!user) {
-    showMessage('User not found. Please use the default admin credentials.');
-    return;
-  }
+  try {
+    const user = await db.users.where('username').equals(username).first();
+    
+    if (!user) {
+      showMessage('User not found. Use: admin / admin123');
+      return;
+    }
 
-  if (user.password !== password) {
-    showMessage('Incorrect credentials.');
-    return;
-  }
+    if (user.password !== password) {
+      showMessage('Incorrect password. Try again.');
+      return;
+    }
 
-  localStorage.setItem('pos_auth', JSON.stringify({ username: user.username, role: user.role }));
-  if (rememberInput.checked) {
-    localStorage.setItem('pos_remember', 'true');
-  }
+    localStorage.setItem('pos_auth', JSON.stringify({ 
+      id: user.id,
+      username: user.username, 
+      role: user.role,
+      timestamp: Date.now()
+    }));
+    
+    if (rememberInput.checked) {
+      localStorage.setItem('pos_remember', 'true');
+    }
 
-  showMessage('Login successful. Redirecting...', 'success');
-  setTimeout(() => {
-    window.location.href = 'dashboard.html';
-  }, 600);
+    showMessage('Login successful. Redirecting...', 'success');
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 800);
+  } catch (error) {
+    console.error('Login error:', error);
+    showMessage('Login failed. Check browser console for details.');
+  }
 }
 
 async function init() {
-  await initDefaultAdmin();
+  try {
+    const dbOk = await verifyDB();
+    if (!dbOk) {
+      showMessage('Database connection failed. Please refresh the page.');
+      return;
+    }
 
-  const auth = localStorage.getItem('pos_auth');
-  if (auth) {
-    window.location.href = 'dashboard.html';
-    return;
+    await initDefaultAdmin();
+
+    const auth = localStorage.getItem('pos_auth');
+    if (auth) {
+      window.location.href = 'dashboard.html';
+      return;
+    }
+
+    loginForm?.addEventListener('submit', handleLogin);
+    console.log('✓ Login page ready');
+  } catch (error) {
+    console.error('Init error:', error);
+    showMessage('Failed to initialize. Check console for details.');
   }
-
-  loginForm?.addEventListener('submit', handleLogin);
 }
 
-init();
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}

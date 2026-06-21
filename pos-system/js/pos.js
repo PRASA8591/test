@@ -20,6 +20,14 @@ function requireAuth() {
   const auth = localStorage.getItem('pos_auth');
   if (!auth) {
     window.location.href = 'index.html';
+    return null;
+  }
+  try {
+    return JSON.parse(auth);
+  } catch (e) {
+    localStorage.removeItem('pos_auth');
+    window.location.href = 'index.html';
+    return null;
   }
 }
 
@@ -149,11 +157,17 @@ function bindEvents() {
 }
 
 function init() {
-  requireAuth();
-  renderNavbar();
+  const user = requireAuth();
+  if (!user) return;
+  renderNavbar(user);
   renderSidebar();
   bindEvents();
   updateCartUI();
+  console.log('✓ POS page loaded');
 }
 
-init();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
