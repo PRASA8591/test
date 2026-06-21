@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products | POS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <div class="min-h-screen flex flex-col lg:flex-row">
+    <div id="sidebar-root" class="w-full lg:w-72"></div>
+    <div class="flex-1">
+      <div id="navbar-root"></div>
+      <main class="mx-auto max-w-7xl px-4 py-6 lg:px-8">
+        <div class="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+          <section class="rounded-3xl border border-slate-800/90 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h1 class="text-2xl font-semibold">Products</h1>
+                <p class="mt-1 text-slate-400">Manage inventory items stored in IndexedDB.</p>
+              </div>
+              <button id="refresh-products" class="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-200 transition hover:border-indigo-500 hover:text-white">Refresh List</button>
+            </div>
+
+            <div class="mt-6 overflow-x-auto rounded-3xl border border-slate-800/90 bg-slate-950/60 p-4">
+              <table class="min-w-full text-left text-sm text-slate-300">
+                <thead class="border-b border-slate-700/80 text-slate-400">
+                  <tr>
+                    <th class="py-3">Barcode</th>
+                    <th class="py-3">Name</th>
+                    <th class="py-3">Category</th>
+                    <th class="py-3">Stock</th>
+                    <th class="py-3">Price</th>
+                  </tr>
+                </thead>
+                <tbody id="product-table-body" class="divide-y divide-slate-800/80"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <aside class="rounded-3xl border border-slate-800/90 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+            <h2 class="text-xl font-semibold">Add Product</h2>
+            <form id="product-form" class="mt-6 space-y-4">
+              <label class="block text-sm text-slate-400">Barcode<input id="product-barcode" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none" placeholder="123456789" /></label>
+              <label class="block text-sm text-slate-400">Product Name<input id="product-name" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none" placeholder="Example Item" /></label>
+              <label class="block text-sm text-slate-400">Category<input id="product-category" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none" placeholder="Beverages" /></label>
+              <label class="block text-sm text-slate-400">Stock<input id="product-stock" type="number" min="0" value="10" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none" /></label>
+              <label class="block text-sm text-slate-400">Price<input id="product-price" type="number" min="0" step="0.01" value="0.00" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none" /></label>
+              <button type="submit" class="w-full rounded-2xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400">Save Product</button>
+              <div id="product-message" class="rounded-2xl p-4 text-sm font-medium hidden"></div>
+            </form>
+          </aside>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="js/products.js"></script>
+</body>
+</html>

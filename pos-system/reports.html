@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports | POS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <div class="min-h-screen flex flex-col lg:flex-row">
+    <div id="sidebar-root" class="w-full lg:w-72"></div>
+    <div class="flex-1">
+      <div id="navbar-root"></div>
+      <main class="mx-auto max-w-7xl px-4 py-6 lg:px-8">
+        <section class="rounded-3xl border border-slate-800/90 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 class="text-2xl font-semibold">Reports</h1>
+              <p class="mt-1 text-slate-400">View sales, inventory, and financial summaries.</p>
+            </div>
+            <button id="refresh-reports" class="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-200 transition hover:border-indigo-500 hover:text-white">Refresh</button>
+          </div>
+
+          <div class="mt-6 grid gap-6 lg:grid-cols-3">
+            <article class="rounded-3xl border border-slate-800/90 bg-slate-950/60 p-5">
+              <p class="text-sm uppercase tracking-[0.24em] text-slate-500">Total Sales</p>
+              <p id="report-sales" class="mt-4 text-3xl font-semibold text-white">$0.00</p>
+            </article>
+            <article class="rounded-3xl border border-slate-800/90 bg-slate-950/60 p-5">
+              <p class="text-sm uppercase tracking-[0.24em] text-slate-500">Transactions</p>
+              <p id="report-transactions" class="mt-4 text-3xl font-semibold text-white">0</p>
+            </article>
+            <article class="rounded-3xl border border-slate-800/90 bg-slate-950/60 p-5">
+              <p class="text-sm uppercase tracking-[0.24em] text-slate-500">Average Sale</p>
+              <p id="report-average" class="mt-4 text-3xl font-semibold text-white">$0.00</p>
+            </article>
+          </div>
+
+          <div class="mt-6 overflow-x-auto rounded-3xl border border-slate-800/90 bg-slate-900/80 p-4">
+            <table class="min-w-full text-left text-sm text-slate-300">
+              <thead class="border-b border-slate-700/80 text-slate-400">
+                <tr>
+                  <th class="py-3">Sale Date</th>
+                  <th class="py-3">Total</th>
+                  <th class="py-3">Method</th>
+                </tr>
+              </thead>
+              <tbody id="report-table-body" class="divide-y divide-slate-800/80"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="js/reports.js"></script>
+</body>
+</html>

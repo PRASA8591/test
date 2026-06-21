@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>POS Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <div class="min-h-screen flex flex-col lg:flex-row">
+    <div id="sidebar-root" class="w-full lg:w-72"></div>
+    <div class="flex-1">
+      <div id="navbar-root"></div>
+      <main class="mx-auto max-w-6xl px-4 py-6 lg:px-8">
+        <section class="grid gap-6 lg:grid-cols-3">
+          <div class="lg:col-span-2 rounded-3xl border border-slate-800/90 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+            <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h1 class="text-2xl font-semibold">Point of Sale</h1>
+                <p class="mt-1 text-slate-400">Scan item barcode or search the catalog to add products.</p>
+              </div>
+              <button id="clear-cart" class="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-200 transition hover:border-indigo-500 hover:text-white">Clear Cart</button>
+            </div>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-2">
+              <label class="block">
+                <span class="text-sm text-slate-400">Barcode / Name</span>
+                <input id="product-search" type="text" placeholder="Enter barcode or product name" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+              </label>
+              <label class="block">
+                <span class="text-sm text-slate-400">Quantity</span>
+                <input id="product-qty" type="number" min="1" value="1" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+              </label>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-3">
+              <button id="add-item" class="rounded-2xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400">Add Item</button>
+              <button id="load-products" class="rounded-2xl border border-slate-700 px-5 py-3 text-sm text-slate-200 transition hover:border-indigo-500 hover:text-white">Load Products</button>
+            </div>
+
+            <div class="mt-6 overflow-x-auto rounded-3xl border border-slate-800/90 bg-slate-900/80 p-4">
+              <table class="w-full text-left text-sm text-slate-300">
+                <thead>
+                  <tr class="border-b border-slate-700/70 text-slate-400">
+                    <th class="py-3">Product</th>
+                    <th class="py-3">Qty</th>
+                    <th class="py-3">Price</th>
+                    <th class="py-3">Total</th>
+                    <th class="py-3">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="cart-list" class="divide-y divide-slate-800/80"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <aside class="rounded-3xl border border-slate-800/90 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+            <div class="space-y-4">
+              <div>
+                <h2 class="text-xl font-semibold">Checkout Summary</h2>
+                <p class="mt-1 text-slate-400">Review totals before completing the sale.</p>
+              </div>
+
+              <div class="grid gap-3 rounded-3xl bg-slate-950/60 p-4">
+                <div class="flex items-center justify-between text-slate-400"><span>Items</span><span id="cart-items">0</span></div>
+                <div class="flex items-center justify-between text-slate-400"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+                <div class="flex items-center justify-between text-slate-400"><span>Payment</span><span>$0.00</span></div>
+              </div>
+
+              <label class="block text-sm text-slate-400">
+                Payment Method
+                <select id="payment-method" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
+                  <option value="Cash">Cash</option>
+                  <option value="Card">Card</option>
+                  <option value="Mobile">Mobile</option>
+                </select>
+              </label>
+
+              <button id="complete-sale" class="w-full rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400">Complete Sale</button>
+              <div id="pos-message" class="rounded-2xl p-4 text-sm font-medium hidden"></div>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="js/pos.js"></script>
+</body>
+</html>
