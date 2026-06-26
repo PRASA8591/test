@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrasaTek Enterprise IT Support Hub</title>
+    <style>
+        :root {
+            --primary: #059669; /* Emerald 600 */
+            --primary-hover: #047857; /* Emerald 700 */
+            --secondary: #0f172a; /* Slate 900 */
+            --background: #f8fafc; /* Slate 50 */
+            --surface: #ffffff;
+            --text-main: #334155; /* Slate 700 */
+            --text-light: #64748b; /* Slate 500 */
+            --border: #e2e8f0; /* Slate 200 */
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Navigation & Tabs */
+        nav {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 70px;
+        }
+
+        .logo {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .nav-tabs {
+            display: flex;
+            height: 100%;
+        }
+
+        .tab-btn {
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            height: 100%;
+            width: auto;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+            background-color: #f8fafc;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background-color: #f0fdf4;
+        }
+
+        /* Views */
+        .view-section {
+            display: none;
+            flex: 1;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* Header banner */
+        .banner {
+            background: linear-gradient(135deg, var(--secondary) 0%, #1e293b 100%);
+            color: white;
+            padding: 3rem 5%;
+            text-align: center;
+        }
+
+        .banner h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .banner p {
+            color: #cbd5e1;
+            font-size: 1.05rem;
+        }
+
+        /* Main Content Grid */
+        .container {
+            padding: 2.5rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 968px) {
+            .portal-grid, .admin-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* UI Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .card h2 {
+            color: var(--secondary);
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--background);
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background-color: var(--background);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+            background-color: var(--surface);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.btn-secondary {
+            background-color: #64748b;
+        }
+        button.btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        button.btn-danger {
+            background-color: var(--danger);
+        }
+        button.btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 999px;
+            text-transform: uppercase;
+        }
+
+        .badge-open { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .badge-progress { background-color: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .badge-closed { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+        /* Admin Layout */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .ticket-list-wrapper {
+            max-height: 700px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .ticket-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ticket-item:hover, .ticket-item.active {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+            background-color: #f0fdf4;
+        }
+
+        .ticket-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .ticket-item h3 {
+            font-size: 1.05rem;
+            color: var(--secondary);
+        }
+
+        /* Ticket Inspection Panel */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+            background: var(--background);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .meta-box span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .meta-box p {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .thread-container {
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .reply-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .reply-box.staff-reply {
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .reply-meta {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-light);
+            padding: 4rem 1rem;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: -100px;
+            right: 20px;
+            background-color: var(--secondary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: bottom 0.3s ease;
+            z-index: 1000;
+        }
+
+        #toast.show { bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">PrasaTek <span>Enterprise Hub</span></div>
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchView('user-view', this)">User Portal</button>
+            <button class="tab-btn" onclick="switchView('admin-view', this)">IT Department View</button>
+        </div>
+    </nav>
+
+    <section id="user-view" class="view-section active">
+        <div class="banner">
+            <h1>Enterprise IT Help Desk</h1>
+            <p>File technical faults, infrastructure requests, and software errors instantly.</p>
+        </div>
+        <div class="container">
+            <div class="portal-grid">
+                <div class="card">
+                    <h2>Submit a Support Request</h2>
+                    <form id="ticketForm">
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="userName">Your Name</label>
+                                <input type="text" id="userName" required placeholder="User Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="userEmail">Email Address</label>
+                                <input type="email" id="userEmail" required placeholder="user@domain.com">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select id="category" required>
+                                    <option value="Software Installation">Software Installation</option>
+                                    <option value="Computer Repair">Computer Repair / Build</option>
+                                    <option value="Networking">Networking & Switches</option>
+                                    <option value="CCTV Security">CCTV Security</option>
+                                    <option value="POS System">POS System Infrastructure</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority</label>
+                                <select id="priority" required>
+                                    <option value="Low">Low - General Ticket</option>
+                                    <option value="Medium">Medium - System Degraded</option>
+                                    <option value="High">High - Workflow Impacted</option>
+                                    <option value="Critical">Critical - Production Down</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Issue Subject</label>
+                            <input type="text" id="subject" required placeholder="Describe error short sentence">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Detailed Log / Error Description</label>
+                            <textarea id="description" required placeholder="Explain steps to replicate, specific code error numbers, environmental conditions..."></textarea>
+                        </div>
+                        <button type="submit">Submit Request</button>
+                    </form>
+                </div>
+
+                <aside>
+                    <div class="card">
+                        <h2>System Diagnostics Help</h2>
+                        <p style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-light);">
+                            Before subimitting, verify basic operational checklists:
+                        </p>
+                        <div style="font-size: 0.85rem; border-left: 3px solid var(--primary); padding-left: 0.75rem; margin-bottom: 1rem;">
+                            <strong>Biometric authentication errors:</strong> Ensure sensor contact surface matches policies. Dynamic resets are structural security locks.
+                        </div>
+                        <div style="font-size: 0.85rem; border-left: 3px solid var(--primary); padding-left: 0.75rem;">
+                            <strong>Enterprise Hotline:</strong> 0719323239
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <section id="admin-view" class="view-section">
+        <div class="banner" style="background: linear-gradient(135deg, #0f172a 0%, #047857 100%);">
+            <h1>Operations Console</h1>
+            <p>Manage, assign, communicate, and track resolution timelines.</p>
+        </div>
+        <div class="container">
+            <div class="admin-grid">
+                
+                <div>
+                    <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">Active Incidents Queue</h2>
+                    <div class="ticket-list-wrapper" id="ticketQueue">
+                        </div>
+                </div>
+
+                <div>
+                    <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">Management Workspace</h2>
+                    <div id="workspaceDetails" class="card" style="min-height: 400px;">
+                        <div class="empty-state">
+                            Select an incident ticket from the active queue to initialize workspace operations.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; <span id="year"></span> PrasaTek Hub. Infrastructure Protection Suite | www.prasatek.site</p>
+    </footer>
+
+    <div id="toast">Action processed successfully.</div>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // In-Memory Global Mock Database
+        let tickets = [
+            {
+                id: "TKT-89410",
+                name: "Amal Silva",
+                email: "amal@store.lk",
+                category: "POS System",
+                priority: "High",
+                subject: "Database connection timed out during initialization phase",
+                description: "The system returns code error 504 on execution startup. Local infrastructure cannot authenticate transactional parameters with central master schemas.",
+                status: "Open",
+                assignedTo: "Unassigned",
+                replies: []
+            },
+            {
+                id: "TKT-32104",
+                name: "Nimal Perera",
+                email: "nimal@branch.lk",
+                category: "Networking",
+                priority: "Critical",
+                subject: "Core aggregation switch down after electrical fluctuation",
+                description: "Entire subnet cannot reach default gateway. LAN connections dropped.",
+                status: "In Progress",
+                assignedTo: "Punsara Prasanna",
+                replies: [
+                    { sender: "Punsara Prasanna", text: "Dispatched local team with spare terminal configuration units.", time: "Just now" }
+                ]
+            }
+        ];
+
+        let selectedTicketId = null;
+
+        // View Switching Control Architecture
+        function switchView(viewId, btnEl) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(viewId).classList.add('active');
+            btnEl.classList.add('active');
+
+            if (viewId === 'admin-view') {
+                renderTicketQueue();
+                renderWorkspace();
+            }
+        }
+
+        // Show Global Notifications
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 4000);
+        }
+
+        // Form Submission Interception
+        document.getElementById('ticketForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newTkt = {
+                id: "TKT-" + Math.floor(10000 + Math.random() * 90000),
+                name: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value,
+                category: document.getElementById('category').value,
+                priority: document.getElementById('priority').value,
+                subject: document.getElementById('subject').value,
+                description: document.getElementById('description').value,
+                status: "Open",
+                assignedTo: "Unassigned",
+                replies: []
+            };
+
+            tickets.unshift(newTkt);
+            document.getElementById('ticketForm').reset();
+            showToast(`Incident logged successfully under ID: ${newTkt.id}`);
+        });
+
+        // Queue Render Core Logic
+        function renderTicketQueue() {
+            const container = document.getElementById('ticketQueue');
+            container.innerHTML = "";
+
+            if (tickets.length === 0) {
+                container.innerHTML = '<div class="empty-state">No incidents inside current system queue index.</div>';
+                return;
+            }
+
+            tickets.forEach(t => {
+                const item = document.createElement('div');
+                item.className = `ticket-item ${selectedTicketId === t.id ? 'active' : ''}`;
+                item.onclick = () => selectTicket(t.id);
+
+                let statusBadge = `<span class="badge badge-open">${t.status}</span>`;
+                if(t.status === 'In Progress') statusBadge = `<span class="badge badge-progress">In Progress</span>`;
+                if(t.status === 'Closed') statusBadge = `<span class="badge badge-closed">Closed</span>`;
+
+                item.innerHTML = `
+                    <div class="ticket-item-header">
+                        <h3>${t.id}: ${t.subject.substring(0, 50)}${t.subject.length > 50 ? '...' : ''}</h3>
+                        ${statusBadge}
+                    </div>
+                    <p style="font-size:0.85rem; color:var(--text-light); margin-bottom: 0.5rem;">
+                        Category: <strong>${t.category}</strong> | Priority: <strong style="color:${t.priority === 'Critical' ? 'var(--danger)' : 'inherit'}">${t.priority}</strong>
+                    </p>
+                    <div style="font-size: 0.8rem; color: var(--text-main); font-weight:600;">
+                        Assignee: ${t.assignedTo}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function selectTicket(id) {
+            selectedTicketId = id;
+            renderTicketQueue();
+            renderWorkspace();
+        }
+
+        // Workspace Controls Engine
+        function renderWorkspace() {
+            const container = document.getElementById('workspaceDetails');
+            const currentTkt = tickets.find(t => t.id === selectedTicketId);
+
+            if (!currentTkt) {
+                container.innerHTML = `<div class="empty-state">Select an incident ticket from the active queue to initialize workspace operations.</div>`;
+                return;
+            }
+
+            // Status Control Configuration Options
+            let actionButtonsHTML = "";
+            if (currentTkt.status !== "Closed") {
+                actionButtonsHTML = `
+                    <button class="btn-danger" onclick="changeStatus('${currentTkt.id}', 'Closed')">Close Incident Ticket</button>
+                `;
+            } else {
+                actionButtonsHTML = `
+                    <button class="btn-secondary" onclick="changeStatus('${currentTkt.id}', 'Open')">Reopen Incident Ticket</button>
+                `;
+            }
+
+            // Reply logs parsing logic
+            let repliesHTML = "";
+            currentTkt.replies.forEach(r => {
+                repliesHTML += `
+                    <div class="reply-box staff-reply">
+                        <div class="reply-meta">
+                            <strong>${r.sender} (Technical Operations)</strong>
+                            <span>${r.time}</span>
+                        </div>
+                        <p style="font-size: 0.9rem;">${r.text}</p>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+                    <h2 style="margin:0; border:none; padding:0;">Control Panel: ${currentTkt.id}</h2>
+                    <div>${actionButtonsHTML}</div>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-box"><span>Requester</span><p>${currentTkt.name}</p></div>
+                    <div class="meta-box"><span>Category</span><p>${currentTkt.category}</p></div>
+                    <div class="meta-box"><span>Current State</span><p>${currentTkt.status}</p></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Assignment Control / Ownership Migration</label>
+                    <select onchange="assignTechnician('${currentTkt.id}', this.value)" style="background-color:#fff; border-color:var(--primary);">
+                        <option value="Unassigned" ${currentTkt.assignedTo === 'Unassigned' ? 'selected' : ''}>Unassigned</option>
+                        <option value="Punsara Prasanna" ${currentTkt.assignedTo === 'Punsara Prasanna' ? 'selected' : ''}>Punsara Prasanna</option>
+                        <option value="Amal Silva" ${currentTkt.assignedTo === 'Amal Silva' ? 'selected' : ''}>Amal Silva</option>
+                        <option value="Nimal Perera" ${currentTkt.assignedTo === 'Nimal Perera' ? 'selected' : ''}>Nimal Perera</option>
+                        <option value="Suresh Perera" ${currentTkt.assignedTo === 'Suresh Perera' ? 'selected' : ''}>Suresh Perera</option>
+                    </select>
+                </div>
+
+                <div style="margin-top:1.5rem; background:#f8fafc; padding:1.25rem; border-radius:var(--radius); border:1px solid var(--border);">
+                    <h4 style="font-size:0.9rem; color:var(--secondary); margin-bottom:0.5rem;">Subject: ${currentTkt.subject}</h4>
+                    <p style="font-size:0.9rem; color:var(--text-main); white-space: pre-line;">${currentTkt.description}</p>
+                </div>
+
+                <div class="thread-container">
+                    <h3 style="font-size:1rem; margin-bottom:1rem;">Communication & Response Thread</h3>
+                    
+                    <div id="repliesLog">${repliesHTML || '<p style="color:var(--text-light); font-size:0.85rem; margin-bottom:1rem;">No technical responses logged on this thread asset yet.</p>'}</div>
+
+                    <div style="margin-top:1rem;">
+                        <textarea id="replyTextarea" placeholder="Write operational update or resolution comments here..." style="background:#fff;"></textarea>
+                        <button onclick="submitReply('${currentTkt.id}')" style="margin-top:0.5rem; width:auto;">Post System Reply</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Administrative Event Operations Triggers
+        function assignTechnician(id, technician) {
+            const target = tickets.find(t => t.id === id);
+            if(target) {
+                target.assignedTo = technician;
+                if(target.status === 'Open' && technician !== 'Unassigned') {
+                    target.status = 'In Progress';
+                }
+                showToast(`Ticket ownership assigned to: ${technician}`);
+                renderTicketQueue();
+                renderWorkspace();
+            }
+        }
+
+        function changeStatus(id, newStatus) {
+            const target = tickets.find(t => t.id === id);
+            if(target) {
+                target.status = newStatus;
+                showToast(`Incident status updated to: ${newStatus}`);
+                renderTicketQueue();
+                renderWorkspace();
+            }
+        }
+
+        function submitReply(id) {
+            const txtArea = document.getElementById('replyTextarea');
+            if(!txtArea || !txtArea.value.trim()) return;
+
+            const target = tickets.find(t => t.id === id);
+            if(target) {
+                // Default to active dispatcher or assignee context
+                const workingUser = target.assignedTo !== "Unassigned" ? target.assignedTo : "Punsara Prasanna";
+                
+                target.replies.push({
+                    sender: workingUser,
+                    text: txtArea.value.trim(),
+                    time: "Just now"
+                });
+
+                if(target.status === 'Open') {
+                    target.status = 'In Progress';
+                }
+
+                showToast("Response recorded into operations file.");
+                renderTicketQueue();
+                renderWorkspace();
+            }
+        }
+    </script>
+</body>
+</html>
